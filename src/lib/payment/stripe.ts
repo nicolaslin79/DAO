@@ -1,11 +1,23 @@
 import Stripe from "stripe";
 import { PRICING_PLANS } from "./pricing";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2026-02-25.clover",
-});
+// 延迟初始化 Stripe，避免构建时失败
+let _stripe: Stripe | null = null;
 
-export { stripe };
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error("STRIPE_SECRET_KEY is not configured");
+    }
+    _stripe = new Stripe(key, {
+      apiVersion: "2026-02-25.clover",
+    });
+  }
+  return _stripe;
+}
+
+export { getStripe };
 
 export async function createCheckoutSession({
   userId,
@@ -25,7 +37,7 @@ export async function createCheckoutSession({
     throw new Error("Invalid plan or missing Stripe price ID");
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: plan.interval ? "subscription" : "payment",
     payment_method_types: ["card"],
     customer_email: email,
@@ -47,7 +59,7 @@ export async function createCheckoutSession({
 }
 
 export async function handleSubscriptionWebhook(event: Stripe.Event) {
-  const { stripe } = await import("./stripe");
+  const stripe = getStripe();
   const prisma = (await import("@/lib/db/prisma")).default;
 
   switch (event.type) {

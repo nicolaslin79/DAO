@@ -11,8 +11,13 @@ const requiredEnvVars = [
 
 const productionEnvVars = [
   "DEEPSEEK_API_KEY",
+] as const;
+
+// 可选的环境变量（支付功能需要）
+const optionalEnvVars = [
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
+  "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
   "GOOGLE_CLIENT_ID",
   "GOOGLE_CLIENT_SECRET",
 ] as const;
@@ -47,6 +52,18 @@ export function validateEnv(): void {
   const secret = process.env.NEXTAUTH_SECRET;
   if (secret && secret.length < 32) {
     console.warn("Warning: NEXTAUTH_SECRET should be at least 32 characters long for security.");
+  }
+
+  // 检查可选环境变量（仅警告）
+  const missingOptional: string[] = [];
+  for (const envVar of optionalEnvVars) {
+    if (!process.env[envVar]) {
+      missingOptional.push(envVar);
+    }
+  }
+  if (missingOptional.length > 0) {
+    console.warn(`Warning: Optional environment variables not set: ${missingOptional.join(", ")}`);
+    console.warn("Some features (payment, Google login) may not work.");
   }
 }
 
