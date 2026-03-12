@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { handleSubscriptionWebhook, stripe } from "@/lib/payment/stripe";
+import { handleSubscriptionWebhook, getStripe } from "@/lib/payment/stripe";
 import Stripe from "stripe";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // 使用stripe实例的webhooks方法
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
     console.error("Webhook signature verification failed:", errorMessage);

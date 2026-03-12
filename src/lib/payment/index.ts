@@ -1,2 +1,2 @@
 export { PRICING_PLANS, getPlanById, getPlanByStripePriceId } from "./pricing";
-export { stripe, createCheckoutSession, handleSubscriptionWebhook } from "./stripe";
+export { getStripe, createCheckoutSession, handleSubscriptionWebhook } from "./stripe";
