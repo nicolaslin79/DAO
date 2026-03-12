@@ -100,7 +100,7 @@ function SignInContent({ locale }: { locale: string }) {
               <Label htmlFor="email">{isZh ? "邮箱" : "Email"}</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
