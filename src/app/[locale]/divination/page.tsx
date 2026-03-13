@@ -214,34 +214,34 @@ export default function DivinationPage({ params }: { params: Promise<{ locale: s
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 起卦方式选择 */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <Button
                 type="button"
                 variant={mode === "auto" ? "default" : "outline"}
                 onClick={() => setMode("auto")}
-                className={`h-auto py-4 flex flex-col items-center gap-2 ${
+                className={`h-auto py-3 px-2 flex flex-col items-center gap-1 ${
                   mode === "auto"
                     ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
                     : ""
                 }`}
               >
-                <Shuffle className="w-6 h-6" />
-                <span className="font-medium">{t.modeAuto}</span>
-                <span className="text-xs opacity-80">{t.modeAutoDesc}</span>
+                <Shuffle className="w-5 h-5" />
+                <span className="font-medium text-sm md:text-base">{t.modeAuto}</span>
+                <span className="text-[10px] md:text-xs opacity-80 text-center leading-tight">{t.modeAutoDesc}</span>
               </Button>
               <Button
                 type="button"
                 variant={mode === "manual" ? "default" : "outline"}
                 onClick={() => setMode("manual")}
-                className={`h-auto py-4 flex flex-col items-center gap-2 ${
+                className={`h-auto py-3 px-2 flex flex-col items-center gap-1 ${
                   mode === "manual"
                     ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
                     : ""
                 }`}
               >
-                <Edit3 className="w-6 h-6" />
-                <span className="font-medium">{t.modeManual}</span>
-                <span className="text-xs opacity-80">{t.modeManualDesc}</span>
+                <Edit3 className="w-5 h-5" />
+                <span className="font-medium text-sm md:text-base">{t.modeManual}</span>
+                <span className="text-[10px] md:text-xs opacity-80 text-center leading-tight">{t.modeManualDesc}</span>
               </Button>
             </div>
 
