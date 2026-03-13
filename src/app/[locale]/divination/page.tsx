@@ -226,8 +226,8 @@ export default function DivinationPage({ params }: { params: Promise<{ locale: s
                 }`}
               >
                 <Shuffle className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium text-xs md:text-sm">{t.modeAuto}</span>
-                <span className="text-[9px] md:text-xs opacity-80 text-center leading-tight line-clamp-2">{t.modeAutoDesc}</span>
+                <span className="font-medium text-xs md:text-sm whitespace-normal break-words text-center">{t.modeAuto}</span>
+                <span className="text-[9px] md:text-xs opacity-80 text-center leading-tight whitespace-normal break-words">{t.modeAutoDesc}</span>
               </Button>
               <Button
                 type="button"
@@ -240,8 +240,8 @@ export default function DivinationPage({ params }: { params: Promise<{ locale: s
                 }`}
               >
                 <Edit3 className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium text-xs md:text-sm">{t.modeManual}</span>
-                <span className="text-[9px] md:text-xs opacity-80 text-center leading-tight line-clamp-2">{t.modeManualDesc}</span>
+                <span className="font-medium text-xs md:text-sm whitespace-normal break-words text-center">{t.modeManual}</span>
+                <span className="text-[9px] md:text-xs opacity-80 text-center leading-tight whitespace-normal break-words">{t.modeManualDesc}</span>
               </Button>
             </div>
 
