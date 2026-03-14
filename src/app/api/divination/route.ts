@@ -74,28 +74,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查用户的记录数量，如果超过5条则删除最旧的
-    const existingCount = await prisma.reading.count({
-      where: { userId: session.user.id },
-    });
-
-    if (existingCount >= 5) {
-      // 找到最旧的记录并删除
-      const oldestReadings = await prisma.reading.findMany({
-        where: { userId: session.user.id },
-        orderBy: { createdAt: "asc" },
-        take: existingCount - 4, // 保留4条，新加1条就是5条
-        select: { id: true },
-      });
-
-      if (oldestReadings.length > 0) {
-        await prisma.reading.deleteMany({
-          where: {
-            id: { in: oldestReadings.map((r) => r.id) },
-          },
-        });
-      }
-    }
+    // 不再限制记录数量，允许无限存储
 
     const reading = await prisma.reading.create({
       data: {
