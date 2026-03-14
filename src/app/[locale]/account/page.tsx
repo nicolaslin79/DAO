@@ -8,18 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, Loader2, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { format } from "date-fns";
-import { zhCN, ja, ko, enUS } from "date-fns/locale";
 
 // 多语言翻译
 const translations = {
@@ -120,6 +108,21 @@ function getText(locale: string) {
   return translations.en;
 }
 
+function formatDate(date: string | Date, locale: string) {
+  const d = new Date(date);
+  const localeMap: Record<string, string> = {
+    zh: "zh-CN",
+    ja: "ja-JP",
+    ko: "ko-KR",
+    en: "en-US",
+  };
+  return d.toLocaleDateString(localeMap[locale] || "en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
 function AccountContent({ locale }: { locale: string }) {
   const t = getText(locale);
   const router = useRouter();
@@ -129,13 +132,8 @@ function AccountContent({ locale }: { locale: string }) {
   const [totalReadings, setTotalReadings] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 10;
-
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [readingToDelete, setReadingToDelete] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
-  const dateLocale = locale === "zh" ? zhCN : locale === "ja" ? ja : locale === "ko" ? ko : enUS;
+  const pageSize = 10;
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -166,6 +164,10 @@ function AccountContent({ locale }: { locale: string }) {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm(t.confirmDelete)) {
+      return;
+    }
+
     setDeletingId(id);
     try {
       const response = await fetch(`/api/divination?id=${id}`, {
@@ -175,7 +177,6 @@ function AccountContent({ locale }: { locale: string }) {
       if (response.ok) {
         setReadings(readings.filter((r) => r.id !== id));
         setTotalReadings(totalReadings - 1);
-        // 如果当前页没有数据了，回到上一页
         if (readings.length === 1 && currentPage > 1) {
           setCurrentPage(currentPage - 1);
         } else {
@@ -188,16 +189,6 @@ function AccountContent({ locale }: { locale: string }) {
       alert(t.deleteFailed);
     } finally {
       setDeletingId(null);
-      setDeleteDialogOpen(false);
-      setReadingToDelete(null);
-    }
-  };
-
-  const formatDateStr = (date: string | Date) => {
-    try {
-      return format(new Date(date), "PPP", { locale: dateLocale });
-    } catch {
-      return String(date);
     }
   };
 
@@ -251,7 +242,7 @@ function AccountContent({ locale }: { locale: string }) {
           {subscription?.status === "ACTIVE" && (
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-500">
-                {t.validUntil}: {formatDateStr(subscription.endDate)}
+                {t.validUntil}: {formatDate(subscription.endDate, locale)}
               </p>
             </div>
           )}
@@ -297,7 +288,7 @@ function AccountContent({ locale }: { locale: string }) {
                       <div className="flex items-center gap-2">
                         <div className="flex items-center text-sm text-gray-500">
                           <Calendar className="h-4 w-4 mr-1" />
-                          {formatDateStr(reading.createdAt)}
+                          {formatDate(reading.createdAt, locale)}
                         </div>
                         <Button
                           variant="outline"
@@ -309,10 +300,7 @@ function AccountContent({ locale }: { locale: string }) {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            setReadingToDelete(reading.id);
-                            setDeleteDialogOpen(true);
-                          }}
+                          onClick={() => handleDelete(reading.id)}
                           disabled={deletingId === reading.id}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                         >
@@ -358,26 +346,6 @@ function AccountContent({ locale }: { locale: string }) {
           )}
         </CardContent>
       </Card>
-
-      {/* 删除确认对话框 */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t.confirmDelete}</AlertDialogTitle>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
-              {t.noReadings.includes("暂无") ? "取消" : "Cancel"}
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => readingToDelete && handleDelete(readingToDelete)}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {t.noReadings.includes("暂无") ? "确定" : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
